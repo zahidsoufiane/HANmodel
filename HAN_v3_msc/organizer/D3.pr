@@ -1,0 +1,160 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr,4)*/
+process DRint(1,1);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),260(95,5))*/
+DCL
+ID BidID,
+Cons Consumption,
+P,Pref Price,
+Busy,S Boolean,
+Sale Boolean:=False;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),284(110,15))*/
+DCL
+RID RTPID,
+RTPuse Boolean:=True;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),116(30,20))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),119(30,35))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),119(30,35))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),122(20,55))*/
+input /*#E*/ 
+SaleEnergy(S,P);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),125(30,75))*/
+task /*#E*/ 
+Sale:=S;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),128(30,90))*/
+task /*#E*/ 
+Pref:=P;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),131(30,110))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),134(80,55))*/
+input /*#E*/ 
+Bid(ID,Cons,P);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),137(85,70))*/
+decision /*#E*/ 
+Sale;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),188(102,87))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),140(85,95))*/
+decision /*#E*/ 
+Busy;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),191(102,112))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),143(85,120))*/
+decision /*#E*/ 
+P>=Pref;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),194(102,137))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),146(90,145))*/
+task /*#E*/ 
+Busy:=True;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),149(80,160))*/
+output /*#E*/ 
+Bid(ID,Cons,P);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),152(90,175))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),248(120,122))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),143(85,120))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),251(117,97))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),140(85,95))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),257(120,72))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),137(85,70))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),155(125,160))*/
+output /*#E*/ 
+AcceptBid(ID,False);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),158(135,175))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),161(155,55))*/
+input /*#E*/ 
+BidAccepted(ID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),164(155,75))*/
+output /*#E*/ 
+AcceptBid(ID,True);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),167(165,95))*/
+task /*#E*/ 
+Busy:=False;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),170(165,110))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),173(210,55))*/
+input /*#E*/ 
+BidRefused(ID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),176(210,75))*/
+output /*#E*/ 
+AcceptBid(ID,False);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),179(220,95))*/
+task /*#E*/ 
+Busy:=False;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),182(220,110))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(1),119(30,35))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),275(25,35))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),278(15,55))*/
+input /*#E*/ 
+RTP(RID,Cons,Dur,P);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),281(20,75))*/
+decision /*#E*/ 
+RTPuse;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),329(37,92))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),287(15,100))*/
+output /*#E*/ 
+RTP(RID,Cons,Dur,P);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),290(20,120))*/
+task /*#E*/ 
+RTPuse:=False;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),293(25,140))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),338(55,77))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),296(65,100))*/
+output /*#E*/ 
+AcceptRTP(RID,False);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),299(75,120))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),281(20,75))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),302(115,55))*/
+input /*#E*/ 
+RTPRefused(RID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),305(115,75))*/
+output /*#E*/ 
+AcceptRTP(RID,False);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),308(125,95))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),311(165,55))*/
+input /*#E*/ 
+RTPAccepted(RID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),314(165,75))*/
+output /*#E*/ 
+AcceptRTP(RID,True);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),317(175,95))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),320(225,55))*/
+save /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr(2),275(25,35))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\DRint.spr,4)*/
+endprocess DRint;

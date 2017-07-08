@@ -1,0 +1,899 @@
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun,4)*/
+package HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun(1),152(70,45))*/
+SYNTYPE
+ AppID=Integer CONSTANTS > 0
+ENDSYNTYPE;
+
+NEWTYPE AppType
+  LITERALS CTRL,CRITICAL,NULL
+ENDNEWTYPE;
+
+SYNTYPE
+ DevPriority=Integer CONSTANTS 0:2
+ENDSYNTYPE;
+
+NEWTYPE
+ AppArray ARRAY(AppID,PID)
+ENDNEWTYPE;
+
+NEWTYPE
+ TypeArray ARRAY(AppID,AppType)
+ENDNEWTYPE;
+
+NEWTYPE
+ ConsArray ARRAY(AppID,Consumption)
+ENDNEWTYPE;
+
+NEWTYPE
+ PryArray ARRAY(AppID,DevPriority)
+ENDNEWTYPE;
+
+SYNTYPE
+ Charge=Real CONSTANTS 0:100
+ENDSYNTYPE;
+
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun(1),149(145,45))*/
+SYNTYPE
+ Consumption=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ FULL=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Price=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Storage=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ BidID=Integer CONSTANTS >0
+ENDSYNTYPE;
+
+SYNTYPE
+ RTPID=Integer CONSTANTS >=0
+ENDSYNTYPE;
+
+NEWTYPE
+ SetID Powerset(AppID)
+ENDNEWTYPE;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun(2),161(45,40))*/
+SIGNAL
+PowerON(AppID,AppType,DevPriority,Consumption),
+PowerOFF(AppID),
+Register(AppID,AppType,DevPriority),
+RegisterOK(AppID),
+AddDevice(AppID,AppType,PID,DevPriority),
+Unregister(AppID),
+DeleteDev(AppID),
+ConnectEV(Charge,Consumption,FULL),
+DisconnectEV,
+RegisterEV,
+RegisterEVOK,
+UnregisterEV,
+EVready(Charge),
+ChargeCar,
+MeteringData(Consumption),
+MeteringSum(Consumption),
+ApproxBilling(Price),
+getMetering,
+SendMetering(Consumption),
+RenewableE(Storage,Duration),
+UseStorage(Boolean),
+ResetCost,
+Bid(BidID,Consumption,Price),
+AcceptBid(BidID,Boolean),
+SaleEnergy(Boolean,Price),
+BidAccepted(BidID),
+BidRefused(BidID),
+getBatteryCharge,
+SendBatteryCharge(Consumption),
+ReviseBattery(Consumption),
+RTP(RTPID,Consumption,Duration,Price),
+AcceptRTP(RTPID,Boolean),
+RTPAccepted(RTPID),
+RTPRefused(RTPID),
+Shutdown(AppID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun(2),158(140,40))*/
+SIGNALLIST ENV2APP=
+PowerON,
+PowerOFF;
+
+SIGNALLIST H2APP=
+RegisterOK,
+Shutdown;
+
+SIGNALLIST APP2H=
+Unregister,
+DeleteDev,
+MeteringData;
+
+SIGNALLIST ENV2IHD=
+UseStorage,
+ChargeCar,
+ResetCost,
+SaleEnergy;
+
+SIGNALLIST IHD2H=
+AddDevice,
+UseStorage;
+
+SIGNALLIST ENV2PEV=
+ConnectEV,
+DisconnectEV;
+
+SIGNALLIST PEV2H=
+RegisterEV,
+UnregisterEV,
+MeteringData,
+SendBatteryCharge;
+
+SIGNALLIST H2PEV=
+RegisterEVOK,
+getBatteryCharge,
+ReviseBattery;
+
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun(2),155(200,40))*/
+SIGNALLIST H2ESI=
+MeteringSum,
+BidAccepted,
+BidRefused,
+RTPAccepted,
+RTPRefused;
+
+SIGNALLIST ESI2H=
+Bid,
+RTP;
+
+SIGNALLIST ESI2ENV=
+SendMetering,
+AcceptBid,
+AcceptRTP;
+
+SIGNALLIST ENV2ESI=
+getMetering,
+Bid,
+RTP;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HANmessages.sun,4)*/
+endpackage HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy,7)*/
+USE HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy,4)*/
+system HAN;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),1067(55,35))*/
+remote P1 SetID;
+remote CArray ConsArray;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),251(120,45))*/
+channel /*#E*/ 
+C11 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),252(107,70))*/
+RenewableE;
+endchannel C11;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),233(175,20))*/
+channel /*#E*/ 
+C9 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),234(155,30))*/
+(ENV2PEV);
+endchannel C9;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),242(137,55))*/
+channel /*#E*/ 
+C10 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+PEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),243(147,72))*/
+(PEV2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),244(147,47))*/
+(H2PEV);
+endchannel C10;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),260(92,82))*/
+channel /*#E*/ 
+C12 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),261(80,92))*/
+(H2ESI);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+ESI to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),262(107,85))*/
+(ESI2H);
+endchannel C12;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),137(180,85))*/
+channel /*#E*/ 
+C3 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),119(200,80))*/
+Appliance to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),138(157,92))*/
+(APP2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),119(200,80))*/
+Appliance with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),139(185,92))*/
+(H2APP);
+endchannel C3;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),179(245,82))*/
+channel /*#E*/ 
+C1 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),119(200,80))*/
+Appliance with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),180(232,92))*/
+(ENV2APP);
+endchannel C1;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),278(35,85))*/
+channel /*#E*/ 
+C14 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+ESI to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),279(17,87))*/
+(ESI2ENV);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),280(30,95))*/
+(ENV2ESI);
+endchannel C14;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),269(102,107))*/
+channel /*#E*/ 
+C13 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),128(85,135))*/
+SM with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),270(105,130))*/
+MeteringSum;
+endchannel C13;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),161(215,115))*/
+channel /*#E*/ 
+C2 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),119(200,80))*/
+Appliance to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),162(195,147))*/
+Register;
+endchannel C2;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),206(167,70))*/
+channel /*#E*/ 
+C6 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),207(175,57))*/
+ChargeCar;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+PEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),208(175,127))*/
+EVready;
+endchannel C6;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),197(137,117))*/
+channel /*#E*/ 
+C5 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),198(137,105))*/
+(IHD2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),199(140,135))*/
+UnregisterEV;
+endchannel C5;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),215(132,150))*/
+channel /*#E*/ 
+C7 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),128(85,135))*/
+SM to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),216(140,152))*/
+ApproxBilling;
+endchannel C7;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),224(117,165))*/
+channel /*#E*/ 
+C8 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),225(65,105))*/
+SaleEnergy;
+endchannel C8;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),188(170,170))*/
+channel /*#E*/ 
+C4 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),189(180,160))*/
+(ENV2IHD);
+endchannel C4;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),134(160,35))*/
+block /*#E*/ 
+PEV referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),125(45,80))*/
+block /*#E*/ 
+ESI referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),122(120,80))*/
+block /*#E*/ 
+HEMS referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),119(200,80))*/
+block /*#E*/ 
+Appliance referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),128(85,135))*/
+block /*#E*/ 
+SM referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy(1),131(160,135))*/
+block /*#E*/ 
+IHD referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HAN.ssy,4)*/
+endsystem HAN;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk,4)*/
+block HEMS;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),236(50,20))*/
+SIGNAL
+ReviseStore(Consumption);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),227(137,27))*/
+signalroute /*#E*/ 
+R17 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),228(117,47))*/
+RenewableE;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),221(175,35))*/
+signalroute /*#E*/ 
+R16 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),222(162,57))*/
+MeteringData;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),185(67,62))*/
+signalroute /*#E*/ 
+R18 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),186(17,65))*/
+MeteringSum;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),176(135,127))*/
+signalroute /*#E*/ 
+R12 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),177(135,177))*/
+MeteringSum;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),212(50,85))*/
+signalroute /*#E*/ 
+R15 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),213(17,95))*/
+getBatteryCharge,
+ReviseBattery;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),214(82,100))*/
+SendBatteryCharge;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),152(192,45))*/
+signalroute /*#E*/ 
+R9 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),153(192,17))*/
+RegisterEVOK;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),154(192,97))*/
+UnregisterEV,
+RegisterEV;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),194(40,112))*/
+signalroute /*#E*/ 
+R13 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),195(17,122))*/
+BidAccepted,
+BidRefused,
+RTPAccepted,
+RTPRefused;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),196(50,122))*/
+RTP,
+Bid;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),203(117,110))*/
+signalroute /*#E*/ 
+R14 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),204(107,87))*/
+ReviseStore;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),125(237,115))*/
+signalroute /*#E*/ 
+R6 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),126(237,125))*/
+RegisterOK;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),127(217,125))*/
+Unregister,
+DeleteDev;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),161(222,62))*/
+signalroute /*#E*/ 
+R10 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),162(162,72))*/
+MeteringData;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),163(240,92))*/
+RegisterOK;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),167(82,152))*/
+signalroute /*#E*/ 
+R11 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+DemandResponse to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),168(82,177))*/
+Shutdown;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),134(192,152))*/
+signalroute /*#E*/ 
+R7 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),135(192,177))*/
+UnregisterEV;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+DeviceDB with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),136(192,137))*/
+AddDevice;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),143(160,147))*/
+signalroute /*#E*/ 
+R8 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+EnergyUse with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),144(152,87))*/
+UseStorage;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),122(115,55))*/
+process /*#E*/ 
+EnergyUse(1,1) referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),119(60,105))*/
+process /*#E*/ 
+DemandResponse(1,1) referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),116(170,105))*/
+process /*#E*/ 
+DeviceDB(1,1) referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),233(132,7))*/
+connect /*#E*/ 
+C11 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),227(137,27))*/
+R17;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),191(7,67))*/
+connect /*#E*/ 
+C12 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),185(67,62))*/
+R18,
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),194(40,112))*/
+R13;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),182(130,187))*/
+connect /*#E*/ 
+C13 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),176(135,127))*/
+R12;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),158(187,7))*/
+connect /*#E*/ 
+C10 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),221(175,35))*/
+R16, 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),152(192,45))*/
+R9,
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),212(50,85))*/
+R15;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),131(257,120))*/
+connect /*#E*/ 
+C3 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),125(237,115))*/
+R6, 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),161(222,62))*/
+R10,
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),167(82,152))*/
+R11;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),140(187,187))*/
+connect /*#E*/ 
+C5 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),134(192,152))*/
+R7, 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk(1),143(160,147))*/
+R8;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\HEMS.sbk,4)*/
+endblock HEMS;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr,4)*/
+process DemandResponse(1,1);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),122(100,10))*/
+VIEWED Store Storage;
+VIEWED EVexist Boolean;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),257(150,10))*/
+DCL
+V_Store Storage,
+V_EVexist Boolean,
+ID BidID,
+Cons, Batt, C Consumption,
+P Price;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),272(85,5))*/
+IMPORTED P1 SetID;
+IMPORTED CArray ConsArray;
+
+VIEWED DevArray AppArray;
+VIEWED TArray TypeArray;
+VIEWED PRArray PryArray;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),566(140,5))*/
+DCL
+Pi SetID,
+CiArray ConsArray,
+DiArray AppArray,
+TiArray TypeArray,
+PiArray PryArray;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),443(190,5))*/
+DCL
+RID RTPID,
+Dur Duration,
+Item AppID,
+newP SetID:=empty,
+ConsTotal Consumption:=0;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),491(110,10))*/
+DCL
+Cur Consumption,
+CurP SetID:=empty;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),116(20,35))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),119(20,50))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),119(20,50))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),125(15,70))*/
+input /*#E*/ 
+Bid(ID,Cons,P);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),128(10,90))*/
+task /*#E*/ 
+V_Store:=VIEW(Store);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),131(15,105))*/
+decision /*#E*/ 
+Cons<V_Store;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),173(50,107))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),164(70,115))*/
+task /*#E*/ 
+V_EVexist:=VIEW(EVexist);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),167(75,130))*/
+decision /*#E*/ 
+V_EVexist;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),185(92,147))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),170(70,155))*/
+output /*#E*/ 
+getBatteryCharge;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),176(80,175))*/
+nextstate /*#E*/ 
+waitBC;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),197(112,132))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),191(120,155))*/
+output /*#E*/ 
+BidRefused(ID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),194(125,175))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),167(75,130))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),155(32,122))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),134(10,135))*/
+output /*#E*/ 
+ReviseStore(Cons);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),137(10,155))*/
+output /*#E*/ 
+BidAccepted(ID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),140(20,175))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),131(15,105))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),119(20,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),179(185,45))*/
+state /*#E*/ 
+waitBC;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),203(170,65))*/
+input /*#E*/ 
+SendBatteryCharge(Batt);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),206(175,85))*/
+decision /*#E*/ 
+Cons<V_Store+Batt;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),236(197,102))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),209(175,110))*/
+output /*#E*/ 
+ReviseStore(V_Store);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),212(175,130))*/
+task {/*#E*/ 
+C:=Cons-V_Store;};
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),215(175,145))*/
+output /*#E*/ 
+ReviseBattery(C);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),218(175,160))*/
+output /*#E*/ 
+BidAccepted(ID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),221(185,175))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),251(247,95))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),224(225,110))*/
+output /*#E*/ 
+BidRefused(ID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),227(235,130))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),206(175,85))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(1),179(185,45))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),275(20,35))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),278(10,55))*/
+input /*#E*/ 
+RTP(RID,Cons,Dur,P);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),281(15,70))*/
+task /*#E*/ 
+Pi:=Pi or import(P1);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),290(10,85))*/
+task /*#E*/ 
+CiArray:=import(CArray);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),419(40,100))*/
+label:
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),296(15,115))*/
+decision /*#E*/ 
+length(Pi)=0;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),332(32,132))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),299(15,140))*/
+task /*#E*/ 
+Item:=take(Pi);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),302(10,155))*/
+task {/*#E*/ 
+DiArray:=VIEW(DevArray);};
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),305(10,170))*/
+task {/*#E*/ 
+TiArray:=VIEW(TArray);};
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),308(10,185))*/
+task {/*#E*/ 
+PiArray:=VIEW(PRArray);};
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),347(120,40))*/
+decision /*#E*/ 
+DiArray(Item)
+/=NULL;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),365(127,65))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),350(120,70))*/
+decision /*#E*/ 
+TiArray(Item)
+=CTRL;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),368(127,95))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),353(120,100))*/
+decision /*#E*/ 
+PiArray(Item)
+=2;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),371(127,122))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),356(100,130))*/
+task /*#E*/ 
+ConsTotal:=ConsTotal+CiArray(Item);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),359(120,145))*/
+task /*#E*/ 
+Incl(Item,newP);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),401(157,105))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),353(120,100))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),398(157,87))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),350(120,70))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),395(160,57))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),347(120,40))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),362(180,165))*/
+join /*#E*/ 
+label;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),344(72,125))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),323(55,140))*/
+nextstate /*#E*/ 
+DecisionStat;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),296(15,115))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),275(20,35))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),431(210,60))*/
+state /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),434(210,85))*/
+save /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(2),431(210,60))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),458(40,35))*/
+state /*#E*/ 
+DecisionStat;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),461(40,50))*/
+input /*#E*/ 
+NONE;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),464(30,70))*/
+decision /*#E*/ 
+ConsTotal>1.1*Cons;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),533(52,87))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),554(75,72))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),479(105,95))*/
+output /*#E*/ 
+RTPRefused(RID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),482(110,110))*/
+task /*#E*/ 
+newP:=empty;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),485(110,125))*/
+task /*#E*/ 
+ConsTotal:=0;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),488(115,140))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),464(30,70))*/
+enddecision;
+grst8466_1:
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),467(30,95))*/
+task /*#E*/ 
+Item:=take(newP);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),470(30,110))*/
+task /*#E*/ 
+incl(Item,CurP);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),473(30,125))*/
+task /*#E*/ 
+Cur:=Cur+CiArray(Item);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),476(35,145))*/
+decision /*#E*/ 
+Cur>1.1*Cons;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),548(42,165))*/
+(True):
+grst8466_2:
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),494(180,50))*/
+task /*#E*/ 
+Item:=take(CurP);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),497(180,70))*/
+output /*#E*/ 
+Shutdown(Item);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),500(180,90))*/
+decision /*#E*/ 
+CurP=empty;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),545(215,90))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),518(197,107))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),503(180,115))*/
+task /*#E*/ 
+Cur:=0,
+ConsTotal:=0,
+newP:=empty;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),506(175,140))*/
+output /*#E*/ 
+RTPAccepted(RID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),509(185,160))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),500(180,90))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),494(180,50))*/
+join /*#E*/ 
+grst8466_2;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),551(70,155))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),467(30,95))*/
+join /*#E*/ 
+grst8466_1;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),476(35,145))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr(3),458(40,35))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model\DemandResponse.spr,4)*/
+endprocess DemandResponse;

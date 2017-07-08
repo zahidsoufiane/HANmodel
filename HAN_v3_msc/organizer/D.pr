@@ -1,0 +1,74 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr,4)*/
+process Device(0, ) FPAR myID AppID, myType AppType,myPR DevPriority, myCons Consumption; ;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),221(165,20))*/
+Timer T:=60;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),119(25,30))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),122(25,50))*/
+nextstate /*#E*/ 
+idle;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),122(25,50))*/
+state /*#E*/ 
+idle;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),125(20,70))*/
+input /*#E*/ 
+Subscribe;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),128(10,90))*/
+output /*#E*/ 
+Register(myID,myType,myPR);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),131(25,110))*/
+nextstate /*#E*/ 
+waitSC;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),122(25,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),134(85,50))*/
+state /*#E*/ 
+waitSC;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),137(80,70))*/
+input /*#E*/ 
+SendCons;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),140(85,90))*/
+/*#E*/ 
+SET(T);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),143(85,110))*/
+nextstate /*#E*/ 
+sendingCons;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),134(85,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),146(145,50))*/
+state /*#E*/ 
+sendingCons;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),149(145,70))*/
+input /*#E*/ 
+T;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),152(135,90))*/
+output /*#E*/ 
+MeteringData(mycons);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),155(145,110))*/
+/*#E*/ 
+SET(T);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),158(145,130))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),146(145,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),161(210,50))*/
+state /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),164(200,70))*/
+priority input /*#E*/ 
+DevStop;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),167(200,90))*/
+output /*#E*/ 
+Unregister(myID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),170(200,110))*/
+output /*#E*/ 
+DevStopped(myID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),173(215,135))*/
+stop /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr(1),161(210,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\Device.spr,4)*/
+endprocess Bad Name!;

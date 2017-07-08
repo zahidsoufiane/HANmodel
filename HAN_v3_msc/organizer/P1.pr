@@ -1,0 +1,615 @@
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun,4)*/
+package HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun(1),152(70,45))*/
+SYNTYPE
+ AppID=Integer CONSTANTS > 0
+ENDSYNTYPE;
+
+NEWTYPE AppType
+  LITERALS CTRL,CRITICAL,NULL
+ENDNEWTYPE;
+
+SYNTYPE
+ DevPriority=Integer CONSTANTS 0:2
+ENDSYNTYPE;
+
+NEWTYPE
+ AppArray ARRAY(AppID,PID)
+ENDNEWTYPE;
+
+NEWTYPE
+ TypeArray ARRAY(AppID,AppType)
+ENDNEWTYPE;
+
+NEWTYPE
+ ConsArray ARRAY(AppID,Consumption)
+ENDNEWTYPE;
+
+NEWTYPE
+ PryArray ARRAY(AppID,DevPriority)
+ENDNEWTYPE;
+
+SYNTYPE
+ Charge=Real CONSTANTS 0:100
+ENDSYNTYPE;
+
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun(1),149(145,50))*/
+SYNTYPE
+ Consumption=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ FULL=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Price=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Storage=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ BidID=Integer CONSTANTS >0
+ENDSYNTYPE;
+
+SYNTYPE
+ RTPID=Integer CONSTANTS >=0
+ENDSYNTYPE;
+
+NEWTYPE
+ SetID Powerset(AppID)
+ENDNEWTYPE;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun(2),161(45,40))*/
+SIGNAL
+PowerON(AppID,AppType,DevPriority,Consumption),
+PowerOFF(AppID),
+Register(AppID,AppType,DevPriority),
+RegisterOK(AppID),
+AddDevice(AppID,AppType,PID,DevPriority),
+Unregister(AppID),
+DeleteDev(AppID),
+ConnectEV(Charge,Consumption,FULL),
+DisconnectEV,
+RegisterEV,
+RegisterEVOK,
+UnregisterEV,
+EVready(Charge),
+ChargeCar,
+MeteringData(Consumption),
+MeteringSum(Consumption),
+ApproxBilling(Price),
+getMetering,
+SendMetering(Consumption),
+RenewableE(Storage,Duration),
+UseStorage(Boolean),
+ResetCost,
+Bid(BidID,Consumption,Price),
+AcceptBid(BidID,Boolean),
+SaleEnergy(Boolean,Price),
+BidAccepted(BidID),
+BidRefused(BidID),
+getBatteryCharge,
+SendBatteryCharge(Consumption),
+ReviseBattery(Consumption),
+RTP(RTPID,Consumption,Duration,Price),
+AcceptRTP(RTPID,Boolean),
+RTPAccepted(RTPID),
+RTPRefused(RTPID),
+Shutdown(AppID);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun(2),158(140,40))*/
+SIGNALLIST ENV2APP=
+PowerON,
+PowerOFF;
+
+SIGNALLIST H2APP=
+RegisterOK,
+Shutdown;
+
+SIGNALLIST APP2H=
+Unregister,
+DeleteDev,
+MeteringData;
+
+SIGNALLIST ENV2IHD=
+UseStorage,
+ChargeCar,
+ResetCost,
+SaleEnergy;
+
+SIGNALLIST IHD2H=
+AddDevice,
+UseStorage;
+
+SIGNALLIST ENV2PEV=
+ConnectEV,
+DisconnectEV;
+
+SIGNALLIST PEV2H=
+RegisterEV,
+UnregisterEV,
+MeteringData,
+SendBatteryCharge;
+
+SIGNALLIST H2PEV=
+RegisterEVOK,
+getBatteryCharge,
+ReviseBattery;
+
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun(2),155(200,40))*/
+SIGNALLIST H2ESI=
+MeteringSum,
+BidAccepted,
+BidRefused,
+RTPAccepted,
+RTPRefused;
+
+SIGNALLIST ESI2H=
+Bid,
+RTP;
+
+SIGNALLIST ESI2ENV=
+SendMetering,
+AcceptBid,
+AcceptRTP;
+
+SIGNALLIST ENV2ESI=
+getMetering,
+Bid,
+RTP;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HANmessages.sun,4)*/
+endpackage HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy,7)*/
+USE HANmessages;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy,4)*/
+system HAN;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),251(120,45))*/
+channel /*#E*/ 
+C11 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),252(107,70))*/
+RenewableE;
+endchannel C11;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),233(175,20))*/
+channel /*#E*/ 
+C9 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),234(155,30))*/
+(ENV2PEV);
+endchannel C9;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),242(137,55))*/
+channel /*#E*/ 
+C10 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+PEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),243(147,72))*/
+(PEV2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),244(147,47))*/
+(H2PEV);
+endchannel C10;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),260(92,82))*/
+channel /*#E*/ 
+C12 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),261(80,92))*/
+(H2ESI);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+ESI to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),262(107,85))*/
+(ESI2H);
+endchannel C12;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),137(180,85))*/
+channel /*#E*/ 
+C3 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),119(200,80))*/
+Appliance to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),138(157,92))*/
+(APP2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),119(200,80))*/
+Appliance with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),139(185,92))*/
+(H2APP);
+endchannel C3;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),179(245,82))*/
+channel /*#E*/ 
+C1 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),119(200,80))*/
+Appliance with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),180(232,92))*/
+(ENV2APP);
+endchannel C1;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),278(35,85))*/
+channel /*#E*/ 
+C14 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+ESI to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),279(17,87))*/
+(ESI2ENV);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),280(30,95))*/
+(ENV2ESI);
+endchannel C14;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),269(102,107))*/
+channel /*#E*/ 
+C13 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),128(85,135))*/
+SM with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),270(105,130))*/
+MeteringSum;
+endchannel C13;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),161(215,115))*/
+channel /*#E*/ 
+C2 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),119(200,80))*/
+Appliance to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),162(195,147))*/
+Register;
+endchannel C2;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),206(167,70))*/
+channel /*#E*/ 
+C6 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+PEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),207(175,57))*/
+ChargeCar;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+PEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),208(175,127))*/
+EVready;
+endchannel C6;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),197(137,117))*/
+channel /*#E*/ 
+C5 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),198(137,105))*/
+(IHD2H);
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+HEMS to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),199(140,135))*/
+UnregisterEV;
+endchannel C5;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),215(132,150))*/
+channel /*#E*/ 
+C7 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),128(85,135))*/
+SM to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),216(140,152))*/
+ApproxBilling;
+endchannel C7;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),224(117,165))*/
+channel /*#E*/ 
+C8 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+ESI with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),225(65,105))*/
+SaleEnergy;
+endchannel C8;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),188(170,170))*/
+channel /*#E*/ 
+C4 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+IHD with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),189(180,160))*/
+(ENV2IHD);
+endchannel C4;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),134(160,35))*/
+block /*#E*/ 
+PEV referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),125(45,80))*/
+block /*#E*/ 
+ESI referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),122(120,80))*/
+block /*#E*/ 
+HEMS referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),119(200,80))*/
+block /*#E*/ 
+Appliance referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),128(85,135))*/
+block /*#E*/ 
+SM referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy(1),131(160,135))*/
+block /*#E*/ 
+IHD referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\HAN.ssy,4)*/
+endsystem HAN;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk,4)*/
+block PEV;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),164(55,20))*/
+SIGNAL
+Subscribe,
+StopEV,
+SendCons,
+Discharge(Consumption);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),155(212,40))*/
+signalroute /*#E*/ 
+R33 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),156(212,75))*/
+(ENV2PEV);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),167(132,50))*/
+signalroute /*#E*/ 
+R34 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),168(20,70))*/
+SendBatteryCharge;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),169(185,72))*/
+(H2PEV);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),137(42,90))*/
+signalroute /*#E*/ 
+R36 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),122(65,80))*/
+EV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),138(17,100))*/
+RegisterEV,
+UnregisterEV,
+MeteringData;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),128(152,95))*/
+signalroute /*#E*/ 
+R35 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),122(65,80))*/
+EV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),129(117,105))*/
+Subscribe,
+StopEV,
+SendCons,
+Discharge;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),146(210,142))*/
+signalroute /*#E*/ 
+R32 from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),147(210,177))*/
+EVready;
+from 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+PlugEV with 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),148(210,117))*/
+ChargeCar;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),122(65,80))*/
+process /*#E*/ 
+EV(0,1) referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),116(185,80))*/
+process /*#E*/ 
+PlugEV(1,1) referenced;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),161(207,7))*/
+connect /*#E*/ 
+C9 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),155(212,40))*/
+R33;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),143(7,95))*/
+connect /*#E*/ 
+C10 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),167(132,50))*/
+R34, 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),137(42,90))*/
+R36;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),152(205,187))*/
+connect /*#E*/ 
+C6 and 
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk(1),146(210,142))*/
+R32;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PEV.sbk,4)*/
+endblock PEV;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr,4)*/
+process PlugEV(1,1);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),116(90,15))*/
+DCL
+EVexist Boolean:=False,
+Ch Charge,
+Cons Consumption,
+EVfull FULL,
+EVID PID;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),260(85,15))*/
+VIEWED Battery Consumption;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),263(150,15))*/
+DCL
+V_Battery,C Consumption;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),119(25,30))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),122(25,50))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),122(25,50))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),125(10,70))*/
+input /*#E*/ 
+ConnectEV(Ch,Cons,EVfull);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),128(20,90))*/
+decision /*#E*/ 
+EVexist;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),188(37,107))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),131(15,115))*/
+task /*#E*/ 
+EVexist:=True;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),134(15,130))*/
+create /*#E*/ 
+EV(Ch,Cons,EVfull);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),335(15,150))*/
+task /*#E*/ 
+EVID:=OFFSPRING;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),137(15,165))*/
+output /*#E*/ 
+Subscribe TO EVID;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),140(25,180))*/
+nextstate /*#E*/ 
+waitOK;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),200(87,100))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),143(75,115))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),128(20,90))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),122(25,50))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),146(120,55))*/
+state /*#E*/ 
+waitOK;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),149(110,75))*/
+input /*#E*/ 
+RegisterEVOK;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),152(115,95))*/
+decision /*#E*/ 
+EVexist;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),209(132,112))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),155(110,120))*/
+output /*#E*/ 
+EVready(Ch);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),158(120,140))*/
+nextstate /*#E*/ 
+WaitOption;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),236(150,97))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),233(160,120))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),152(115,95))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),146(120,55))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),161(200,55))*/
+state /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),164(190,75))*/
+priority input /*#E*/ 
+DisconnectEV;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),167(195,95))*/
+decision /*#E*/ 
+EVexist;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),221(212,112))*/
+(True):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),170(190,120))*/
+task /*#E*/ 
+EVexist:=False;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),173(190,140))*/
+output /*#E*/ 
+StopEV TO EVID;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),176(200,160))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),245(230,97))*/
+(False):
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),242(240,120))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),167(195,95))*/
+enddecision;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(1),161(200,55))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),269(30,55))*/
+state /*#E*/ 
+waitOption;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),272(25,75))*/
+input /*#E*/ 
+ChargeCar;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),275(20,95))*/
+output /*#E*/ 
+SendCons TO EVID;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),278(30,115))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),281(75,75))*/
+input /*#E*/ 
+getBatteryCharge;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),284(75,95))*/
+task /*#E*/ 
+V_Battery:=VIEW(Battery);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),287(70,115))*/
+output /*#E*/ 
+SendBatteryCharge(V_Battery);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),290(85,135))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),293(140,75))*/
+input /*#E*/ 
+ReviseBattery(C);
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),296(140,95))*/
+output /*#E*/ 
+Discharge(C) TO EVID;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),299(150,115))*/
+nextstate /*#E*/ 
+-;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),266(210,75))*/
+save /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr(2),269(30,55))*/
+endstate;
+/*#SDTREF(SDL,C:\Users\ZAHID\Desktop\HAN_model2\PlugEV.spr,4)*/
+endprocess PlugEV;

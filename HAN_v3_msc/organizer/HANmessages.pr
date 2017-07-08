@@ -1,0 +1,160 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun,4)*/
+package HANmessages;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun(1),119(70,45))*/
+SYNTYPE
+ AppID=Integer CONSTANTS > 0
+ENDSYNTYPE;
+
+NEWTYPE AppType
+  LITERALS CRTL,CRITICAL,NULL
+ENDNEWTYPE;
+
+SYNTYPE
+ DevPriority=Integer CONSTANTS 0:2
+ENDSYNTYPE;
+
+NEWTYPE
+ AppArray ARRAY(AppID,PID)
+ENDNEWTYPE;
+
+NEWTYPE
+ TypeArray ARRAY(AppID,AppType)
+ENDNEWTYPE;
+
+NEWTYPE
+ ConsArray ARRAY(AppID,Consumption)
+ENDNEWTYPE;
+
+NEWTYPE
+ PryArray ARRAY(AppID,DevPriority)
+ENDNEWTYPE;
+
+SYNTYPE
+ Charge=Real CONSTANTS 0:100
+ENDSYNTYPE;
+
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun(1),122(150,50))*/
+SYNTYPE
+ Consumption=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ FULL=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Price=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ Storage=Real CONSTANTS >=0
+ENDSYNTYPE;
+
+SYNTYPE
+ BidID=Integer CONSTANTS >0
+ENDSYNTYPE;
+
+SYNTYPE
+ RTPID=Integer CONSTANTS >=0
+ENDSYNTYPE;
+
+NEWTYPE
+ SetID Powerset(AppID)
+ENDNEWTYPE;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun(2),140(35,40))*/
+SIGNAL
+PowerON(AppID,AppType,DevPriority,Consumption),
+PowerOFF(AppID),
+Register(AppID,AppType,DevPriority),
+RegisterOK(AppID),
+AddDevice(AppID,AppType,PID,DevPriority),
+Unregister(AppID),
+DeleteDev(AppID),
+ConnectEV(Charge,Consumption,FULL),
+DisconnectEV,
+RegisterEV,
+RegisterEVOK,
+UnregisterEV,
+EVready(Charge),
+ChargeCar,
+MeteringData(Consumption),
+MeteringSum(Consumption),
+getMetering,
+SendMetering(Consumption),
+RenewableE(Storage,Duration),
+UseStorage(Boolean),
+ResetCost,
+Bid(BidID,Consumption,Price),
+AcceptBid(BidID,Boolean),
+SaleEnergy(Boolean,Price),
+BidAccepted(BidID),
+BidRefused(BidID),
+getBatteryCharge,
+SendBatteryCharge(Consumption),
+ReviseBattery(Consumption),
+RTP(RTPID,Consumption,Duration,Price),
+AcceptRTP(RTPID,Boolean),
+RTPAccepted(RTPID),
+RTPRefused(RTPID),
+Shutdown(AppID);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun(2),143(130,40))*/
+SIGNALLIST ENV2APP=
+PowerON,
+PowerOFF;
+
+SIGNALLIST H2APP=
+RegisterOK,
+Shutdown;
+
+SIGNALLIST APP2H=
+Unregister,
+DeleteDev,
+MeteringData;
+
+SIGNALLIST ENV2IHD=
+UseStorage,
+ChargeCar,
+ResetCost,
+SaleEnergy;
+
+SIGNALLIST IHD2H=
+AddDevice,
+UseStorage;
+
+SIGNALLIST ENV2PEV=
+ConnectEV,
+DisconnectEV;
+
+SIGNALLIST PEV2H=
+RegisterEV,
+UnregisterEV,
+MeteringData,
+SendBatteryCharge;
+
+SIGNALLIST H2PEV=
+RegisterEVOK,
+getBatteryCharge,
+ReviseBattery;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun(2),146(190,40))*/
+SIGNALLIST H2ESI=
+MeteringSum,
+BidAccepted,
+BidRefused,
+RTPAccepted,
+RTPRefused;
+
+SIGNALLIST ESI2H=
+Bid,
+RTP;
+
+SIGNALLIST ESI2ENV=
+SendMetering,
+AcceptBid,
+AcceptRTP;
+
+SIGNALLIST ENV2ESI=
+getMetering,
+Bid,
+RTP;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\HANmessages.sun,4)*/
+endpackage HANmessages;

@@ -1,0 +1,100 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk,4)*/
+block ESI;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),164(40,90))*/
+signalroute /*#E*/ 
+R22 from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),116(110,45))*/
+AMIint to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),165(25,117))*/
+SendMetering;
+from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),116(110,45))*/
+AMIint with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),166(92,65))*/
+getMetering;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),149(65,122))*/
+signalroute /*#E*/ 
+R20 from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+DRint to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),150(17,132))*/
+AcceptBid,
+AcceptRTP;
+from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+DRint with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),151(100,132))*/
+RTP,
+Bid;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),140(212,122))*/
+signalroute /*#E*/ 
+R19 from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+DRint to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),141(247,132))*/
+Bid;
+from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+DRint with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),142(167,132))*/
+BidAccepted,
+BidRefused,
+RTPAccepted,
+RTPRefused;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),158(232,95))*/
+signalroute /*#E*/ 
+R21 from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),116(110,45))*/
+AMIint with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),159(167,67))*/
+MeteringSum;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),122(137,157))*/
+signalroute /*#E*/ 
+R18 from 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),104(15,15))*/
+env to 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+DRint with 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),123(137,147))*/
+SaleEnergy;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),116(110,45))*/
+process /*#E*/ 
+AMIint(1,1) referenced;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),119(110,110))*/
+process /*#E*/ 
+DRint(1,1) referenced;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),155(7,127))*/
+connect /*#E*/ 
+C14 and 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),164(40,90))*/
+R22, 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),149(65,122))*/
+R20;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),146(257,127))*/
+connect /*#E*/ 
+C12 and 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),140(212,122))*/
+R19, 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),158(232,95))*/
+R21;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),128(132,187))*/
+connect /*#E*/ 
+C8 and 
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk(1),122(137,157))*/
+R18;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\ESI.sbk,4)*/
+endblock ESI;

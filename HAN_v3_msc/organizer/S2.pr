@@ -1,0 +1,159 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr,4)*/
+process SetAndDisplay(1,1);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),179(90,10))*/
+DCL
+DevID AppID,
+DevType AppType,
+SenderID PID,
+Ch Charge,
+PR DevPriority,
+Tcost Price,
+MyCost,OldCost Price:=0,
+Internal,Evexist Boolean:=False,
+S Boolean;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),251(85,15))*/
+DCL
+Sale Boolean,
+Pref Price;
+
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),116(25,40))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),119(25,60))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),119(25,60))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),122(10,80))*/
+input /*#E*/ 
+Register(DevID,DevType,PR);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),125(15,100))*/
+task /*#E*/ 
+SenderID:=SENDER;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),128(5,120))*/
+output /*#E*/ 
+AddDevice(DevID,DevType,SenderID,PR);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),131(25,140))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),134(80,80))*/
+input /*#E*/ 
+EVready(Ch);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),137(80,100))*/
+task /*#E*/ 
+EVexist:=True;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),140(85,120))*/
+decision /*#E*/ 
+'Charge the Car';
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),197(90,137))*/
+('YES'):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),143(85,145))*/
+output /*#E*/ 
+ChargeCar;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),203(117,122))*/
+('NO'):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),140(85,120))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),146(90,170))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),149(145,80))*/
+input /*#E*/ 
+ApproxBilling(Tcost);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),152(145,100))*/
+task /*#E*/ 
+MyCost:=Tcost-OldCost;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),155(155,120))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),158(205,80))*/
+input /*#E*/ 
+UseStorage(S);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),161(210,100))*/
+decision /*#E*/ 
+Internal XOR S;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),224(227,122))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),164(205,130))*/
+task /*#E*/ 
+Internal:=S;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),167(200,150))*/
+output /*#E*/ 
+UseStorage(Internal);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),236(242,105))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),161(210,100))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),170(215,170))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(1),119(25,60))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),257(20,55))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),260(10,75))*/
+input /*#E*/ 
+UnregisterEV;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),263(10,95))*/
+task /*#E*/ 
+EVexist:=False;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),266(20,115))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),269(70,75))*/
+input /*#E*/ 
+ChargeCar;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),272(75,95))*/
+decision /*#E*/ 
+EVexist;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),320(92,112))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),275(70,120))*/
+output /*#E*/ 
+ChargeCar;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),326(105,97))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),272(75,95))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),278(80,140))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),281(130,75))*/
+input /*#E*/ 
+ResetCost;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),284(125,95))*/
+task /*#E*/ 
+OldCost:=MyCost;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),287(135,115))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),290(175,75))*/
+input /*#E*/ 
+SaleEnergy(S,Pref);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),293(180,95))*/
+decision /*#E*/ 
+Sale XOR S;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),338(197,112))*/
+(True):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),296(180,120))*/
+task /*#E*/ 
+Sale:=S;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),299(175,135))*/
+output /*#E*/ 
+SaleEnergy(Sale,Pref);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),356(212,97))*/
+(False):
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),293(180,95))*/
+enddecision;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),302(185,155))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),254(230,75))*/
+save /*#E*/ 
+*;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr(2),257(20,55))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\SetAndDisplay.spr,4)*/
+endprocess SetAndDisplay;

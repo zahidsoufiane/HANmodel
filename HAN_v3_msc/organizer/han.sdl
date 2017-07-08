@@ -1,0 +1,986 @@
+USE HANmessages;
+SYSTEM HAN;
+REMOTE
+  P1 SetID;
+REMOTE
+  CArray ConsArray;
+CHANNEL C11
+  FROM ENV TO HEMS WITH RenewableE;
+ENDCHANNEL C11;
+CHANNEL C9
+  FROM ENV TO PEV WITH (ENV2PEV);
+ENDCHANNEL C9;
+CHANNEL C10
+  FROM PEV TO HEMS WITH (PEV2H);
+  FROM HEMS TO PEV WITH (H2PEV);
+ENDCHANNEL C10;
+CHANNEL C12
+  FROM HEMS TO ESI WITH (H2ESI);
+  FROM ESI TO HEMS WITH (ESI2H);
+ENDCHANNEL C12;
+CHANNEL C3
+  FROM Appliance TO HEMS WITH (APP2H);
+  FROM HEMS TO Appliance WITH (H2APP);
+ENDCHANNEL C3;
+CHANNEL C1
+  FROM ENV TO Appliance WITH (ENV2APP);
+ENDCHANNEL C1;
+CHANNEL C14
+  FROM ESI TO ENV WITH (ESI2ENV);
+  FROM ENV TO ESI WITH (ENV2ESI);
+ENDCHANNEL C14;
+CHANNEL C13
+  FROM HEMS TO SM WITH MeteringSum;
+ENDCHANNEL C13;
+CHANNEL C2
+  FROM Appliance TO IHD WITH Register;
+ENDCHANNEL C2;
+CHANNEL C6
+  FROM IHD TO PEV WITH ChargeCar;
+  FROM PEV TO IHD WITH EVready;
+ENDCHANNEL C6;
+CHANNEL C5
+  FROM IHD TO HEMS WITH (IHD2H);
+  FROM HEMS TO IHD WITH UnregisterEV;
+ENDCHANNEL C5;
+CHANNEL C7
+  FROM SM TO IHD WITH ApproxBilling;
+ENDCHANNEL C7;
+CHANNEL C8
+  FROM IHD TO ESI WITH SaleEnergy;
+ENDCHANNEL C8;
+CHANNEL C4
+  FROM ENV TO IHD WITH (ENV2IHD);
+ENDCHANNEL C4;
+BLOCK PEV REFERENCED;
+BLOCK ESI REFERENCED;
+BLOCK HEMS REFERENCED;
+BLOCK Appliance REFERENCED;
+BLOCK SM REFERENCED;
+BLOCK IHD REFERENCED;
+ENDSYSTEM HAN;
+
+
+
+BLOCK Appliance;
+SIGNAL
+  SendCons,
+  DevStop,
+  DevStopped(AppID),
+  Subscribe;
+SIGNALROUTE R5
+  FROM SmartPlug TO ENV WITH DeleteDev;
+  FROM ENV TO SmartPlug WITH Shutdown, RegisterOK;
+SIGNALROUTE R4
+  FROM Device TO ENV WITH Unregister, MeteringData;
+SIGNALROUTE R1
+  FROM ENV TO SmartPlug WITH PowerON, PowerOFF;
+SIGNALROUTE R2
+  FROM SmartPlug TO Device WITH SendCons, DevStop, Subscribe;
+  FROM Device TO SmartPlug WITH DevStopped;
+SIGNALROUTE R3
+  FROM Device TO ENV WITH Register;
+PROCESS Device (0) REFERENCED;
+PROCESS SmartPlug (1, 1) REFERENCED;
+CONNECT C3 AND R5, R4;
+CONNECT C1 AND R1;
+CONNECT C2 AND R3;
+ENDBLOCK Appliance;
+
+
+
+PROCESS SmartPlug (1, 1);
+DCL
+  DevID,
+  ConfID,
+  TestID AppID,
+  DevType AppType,
+  DevArray AppArray,
+  PR DevPriority,
+  Cons Consumption;
+DCL EXPORTED
+  P1 SetID;
+DCL EXPORTED
+  CArray ConsArray;
+DCL
+  OffSet SetID := empty;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT PowerON(DevID, DevType, PR, Cons);
+    DECISION DevArray(DevID);
+    (NULL) :
+      CREATE Device(DevID, DevType, PR, Cons);
+      TASK P1 := incl(DevID, P1),
+        CArray(DevID) := Cons;
+      TASK {
+        EXPORT(P1);
+        EXPORT(CArray);
+      };
+      TASK DevArray(DevID) := OFFSPRING,
+        TestID := DevID;
+      OUTPUT Subscribe TO DevArray(DevID);
+      NEXTSTATE waitOK;
+    ELSE :
+      NEXTSTATE -;
+    ENDDECISION;
+  INPUT RegisterOK(DevID);
+    OUTPUT DeleteDev(DevID);
+    NEXTSTATE -;
+ENDSTATE;
+
+STATE waitOK;
+  INPUT RegisterOK(ConfID);
+    DECISION TestID = ConfID;
+    (True) :
+      DECISION DevArray(ConfID);
+      (NULL) :
+      ELSE :
+        OUTPUT SendCons TO DevArray(ConfID);
+      ENDDECISION;
+    (False) :
+    ENDDECISION;
+    NEXTSTATE ready;
+ENDSTATE;
+
+STATE * ;
+  PRIORITY INPUT DevStopped(DevID);
+    TASK DevArray(DevID) := NULL;
+    TASK  del(DevID, OffSet);
+    NEXTSTATE -;
+  PRIORITY INPUT PowerOFF(DevID);
+    grst7745_1 :
+    DECISION DevID IN OffSet;
+    (True) :
+      NEXTSTATE -;
+    (False) :
+      DECISION DevArray(DevID);
+      (NULL) :
+        NEXTSTATE -;
+      ELSE :
+        TASK  incl(DevID, OffSet);
+        DECISION TestID = DevID;
+        (True) :
+          OUTPUT DevStop TO DevArray(DevID);
+          NEXTSTATE ready;
+        (False) :
+          OUTPUT DevStop TO DevArray(DevID);
+          NEXTSTATE -;
+        ENDDECISION;
+      ENDDECISION;
+    ENDDECISION;
+  PRIORITY INPUT Shutdown(DevID);
+    JOIN grst7745_1;
+ENDSTATE;
+ENDPROCESS SmartPlug;
+
+
+
+PROCESS Device (0);
+FPAR
+  myID AppID,
+  myType AppType,
+  myPR DevPriority,
+  myCons Consumption;
+TIMER
+  T := 60;
+
+START;
+    NEXTSTATE idle;
+
+STATE idle;
+  INPUT Subscribe;
+    OUTPUT Register(myID, myType, myPR);
+    NEXTSTATE waitSC;
+ENDSTATE;
+
+STATE waitSC;
+  INPUT SendCons;
+    SET(T);
+    NEXTSTATE sendingCons;
+ENDSTATE;
+
+STATE sendingCons;
+  INPUT T;
+    OUTPUT MeteringData(mycons);
+    SET(T);
+    NEXTSTATE -;
+ENDSTATE;
+
+STATE * ;
+  PRIORITY INPUT DevStop;
+    OUTPUT Unregister(myID);
+    OUTPUT DevStopped(myID);
+    STOP;
+ENDSTATE;
+ENDPROCESS Device;
+
+
+
+BLOCK HEMS;
+SIGNAL
+  ReviseStore(Consumption);
+SIGNALROUTE R17
+  FROM ENV TO EnergyUse WITH RenewableE;
+SIGNALROUTE R16
+  FROM ENV TO EnergyUse WITH MeteringData;
+SIGNALROUTE R18
+  FROM EnergyUse TO ENV WITH MeteringSum;
+SIGNALROUTE R12
+  FROM EnergyUse TO ENV WITH MeteringSum;
+SIGNALROUTE R15
+  FROM DemandResponse TO ENV WITH getBatteryCharge, ReviseBattery;
+  FROM ENV TO DemandResponse WITH SendBatteryCharge, RevisedBatt;
+SIGNALROUTE R9
+  FROM DeviceDB TO ENV WITH RegisterEVOK;
+  FROM ENV TO DeviceDB WITH UnregisterEV, RegisterEV;
+SIGNALROUTE R13
+  FROM DemandResponse TO ENV 
+    WITH BidAccepted, BidRefused, RTPAccepted, RTPRefused;
+  FROM ENV TO DemandResponse WITH RTP, Bid;
+SIGNALROUTE R14
+  FROM DemandResponse TO EnergyUse WITH ReviseStore;
+SIGNALROUTE R6
+  FROM DeviceDB TO ENV WITH RegisterOK;
+  FROM ENV TO DeviceDB WITH Unregister, DeleteDev;
+SIGNALROUTE R10
+  FROM ENV TO EnergyUse WITH MeteringData;
+  FROM EnergyUse TO ENV WITH RegisterOK;
+SIGNALROUTE R11
+  FROM DemandResponse TO ENV WITH Shutdown;
+SIGNALROUTE R7
+  FROM DeviceDB TO ENV WITH UnregisterEV;
+  FROM ENV TO DeviceDB WITH AddDevice;
+SIGNALROUTE R8
+  FROM ENV TO EnergyUse WITH UseStorage;
+PROCESS EnergyUse (1, 1) REFERENCED;
+PROCESS DemandResponse (1, 1) REFERENCED;
+PROCESS DeviceDB (1, 1) REFERENCED;
+CONNECT C11 AND R17;
+CONNECT C12 AND R18, R13;
+CONNECT C13 AND R12;
+CONNECT C10 AND R16, R9, R15;
+CONNECT C3 AND R6, R10, R11;
+CONNECT C5 AND R7, R8;
+ENDBLOCK HEMS;
+
+
+
+PROCESS DeviceDB (1, 1);
+DCL
+  DevID AppID,
+  DevType AppType,
+  SenderID PID,
+  PR DevPriority;
+DCL REVEALED
+  DevArray AppArray;
+DCL REVEALED
+  TArray TypeArray;
+DCL REVEALED
+  EVexist Boolean := False;
+DCL REVEALED
+  PRArray PryArray;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT AddDevice(DevID, DevType, SenderID, PR);
+    TASK DevArray(DevID) := SenderID;
+    TASK TArray(DevID) := DevType;
+    TASK PRArray(DevID) := PR;
+    OUTPUT RegisterOK(DevID);
+    NEXTSTATE -;
+  PRIORITY INPUT Unregister(DevID);
+    grst9415_1 :
+    TASK DevArray(DevID) := NULL;
+    TASK TArray(DevID) := NULL;
+    NEXTSTATE -;
+  PRIORITY INPUT DeleteDev(DevID);
+    JOIN grst9415_1;
+  INPUT RegisterEV;
+    TASK EVexist := True;
+    OUTPUT RegisterEVOK;
+    NEXTSTATE -;
+  PRIORITY INPUT UnregisterEV;
+    TASK EVexist := False;
+    OUTPUT UnregisterEV VIA R7;
+    NEXTSTATE -;
+ENDSTATE;
+ENDPROCESS DeviceDB;
+
+
+
+PROCESS DemandResponse (1, 1);
+VIEWED
+  Store Storage;
+VIEWED
+  EVexist Boolean;
+DCL
+  V_Store Storage,
+  V_EVexist,
+  resp Boolean,
+  ID BidID,
+  Cons,
+  Batt,
+  C Consumption,
+  P Price;
+IMPORTED
+  P1 SetID;
+IMPORTED
+  CArray ConsArray;
+VIEWED
+  DevArray AppArray;
+VIEWED
+  TArray TypeArray;
+VIEWED
+  PRArray PryArray;
+DCL
+  Pi SetID,
+  CiArray ConsArray,
+  DiArray AppArray,
+  TiArray TypeArray,
+  PiArray PryArray;
+DCL
+  RID RTPID,
+  Dur Duration,
+  Item AppID,
+  newP SetID := empty,
+  ConsTotal,
+  RCons Consumption := 0;
+DCL
+  Cur Consumption,
+  CurP SetID := empty;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT Bid(ID, Cons, P);
+    TASK V_Store := VIEW(Store);
+    DECISION Cons < V_Store;
+    (False) :
+      TASK V_EVexist := VIEW(EVexist);
+      DECISION V_EVexist;
+      (True) :
+        OUTPUT getBatteryCharge;
+        NEXTSTATE waitBC;
+      (False) :
+        OUTPUT BidRefused(ID);
+        NEXTSTATE -;
+      ENDDECISION;
+    (True) :
+      OUTPUT ReviseStore(Cons);
+      OUTPUT BidAccepted(ID);
+      NEXTSTATE -;
+    ENDDECISION;
+ENDSTATE;
+
+STATE waitRevision;
+  INPUT RevisedBatt(resp);
+    DECISION resp;
+    (False) :
+      OUTPUT BidRefused(ID);
+    (True) :
+      OUTPUT BidAccepted(ID);
+    ENDDECISION;
+    NEXTSTATE ready;
+ENDSTATE;
+
+STATE waitBC;
+  INPUT SendBatteryCharge(Batt);
+    TASK V_Store := VIEW(Store);
+    DECISION Cons < V_Store + Batt;
+    (True) :
+      OUTPUT ReviseStore(V_Store);
+      TASK {
+        C := Cons - V_Store;
+      };
+      OUTPUT ReviseBattery(C);
+      NEXTSTATE waitRevision;
+    (False) :
+      OUTPUT BidRefused(ID);
+      NEXTSTATE ready;
+    ENDDECISION;
+ENDSTATE;
+
+STATE ready;
+  INPUT RTP(RID, Cons, Dur, P);
+    TASK RCons := Cons;
+    TASK Pi := 
+          IMPORT(P1),
+      CiArray := 
+          IMPORT(CArray);
+    label :
+    DECISION length(Pi) = 0;
+    (False) :
+      TASK Item := take(Pi);
+      TASK {
+        DiArray := VIEW(DevArray);
+      };
+      TASK {
+        TiArray := VIEW(TArray);
+      };
+      TASK {
+        PiArray := VIEW(PRArray);
+      };
+      DECISION DiArray(Item) /= NULL;
+      (True) :
+        DECISION TiArray(Item) = CTRL;
+        (True) :
+          DECISION PiArray(Item) = 2;
+          (True) :
+            TASK ConsTotal := ConsTotal + CiArray(Item);
+            TASK  Incl(Item, newP);
+          (False) :
+          ENDDECISION;
+        (False) :
+        ENDDECISION;
+      (False) :
+      ENDDECISION;
+      TASK  del(item, Pi);
+      JOIN label;
+    (True) :
+      NEXTSTATE DecisionStat;
+    ENDDECISION;
+ENDSTATE;
+
+STATE * ;
+  SAVE *;
+ENDSTATE;
+
+STATE DecisionStat;
+  INPUT NONE;
+    DECISION ConsTotal > 1.1 * RCons;
+    (True) :
+    (False) :
+      OUTPUT RTPRefused(RID);
+      TASK newP := empty;
+      TASK ConsTotal := 0;
+      NEXTSTATE ready;
+    ENDDECISION;
+    grst8466_1 :
+    TASK Item := take(newP);
+    TASK  incl(Item, CurP);
+    TASK Cur := Cur + CiArray(Item);
+    DECISION Cur > 1.1 * RCons;
+    (True) :
+      grst8466_2 :
+      TASK Item := take(CurP);
+      OUTPUT Shutdown(Item);
+      TASK  del(item, CurP);
+      DECISION CurP = empty;
+      (False) :
+      (True) :
+        TASK Cur := 0,
+          ConsTotal := 0,
+          newP := empty;
+        OUTPUT RTPAccepted(RID);
+        NEXTSTATE ready;
+      ENDDECISION;
+      JOIN grst8466_2;
+    (False) :
+      JOIN grst8466_1;
+    ENDDECISION;
+ENDSTATE;
+ENDPROCESS DemandResponse;
+
+
+
+PROCESS EnergyUse (1, 1);
+DCL
+  Cons,
+  SumCons Consumption,
+  gen,
+  G Storage,
+  Dgen Duration,
+  Internal,
+  InProgress Boolean := False,
+  intValue Boolean;
+DCL REVEALED
+  Store Storage := 0;
+TIMER
+  Tgen;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT MeteringData(Cons);
+    DECISION Internal;
+    (True) :
+      DECISION Store > Cons;
+      (False) :
+      (True) :
+        TASK Store := Store - Cons;
+        NEXTSTATE -;
+      ENDDECISION;
+    (False) :
+    ENDDECISION;
+    TASK SumCons := SumCons + Cons;
+    OUTPUT MeteringSum(SumCons) VIA R12;
+    OUTPUT MeteringSum(SumCons) VIA R18;
+    NEXTSTATE -;
+  INPUT UseStorage(intValue);
+    TASK Internal := intValue;
+    NEXTSTATE -;
+  INPUT RenewableE(gen, Dgen);
+    DECISION InProgress;
+    (False) :
+      TASK InProgress := True;
+      TASK G := gen;
+      SET(NOW + Dgen, Tgen);
+    (True) :
+    ENDDECISION;
+    NEXTSTATE -;
+  PRIORITY INPUT Tgen;
+    TASK Store := gen;
+    TASK InProgress := False;
+    NEXTSTATE -;
+  INPUT ReviseStore(Cons);
+    TASK Store := Store - Cons;
+    NEXTSTATE -;
+ENDSTATE;
+ENDPROCESS EnergyUse;
+
+
+
+BLOCK ESI;
+SIGNALROUTE R22
+  FROM AMIint TO ENV WITH SendMetering;
+  FROM ENV TO AMIint WITH getMetering;
+SIGNALROUTE R20
+  FROM DRint TO ENV WITH AcceptBid, AcceptRTP;
+  FROM ENV TO DRint WITH RTP, Bid;
+SIGNALROUTE R19
+  FROM DRint TO ENV WITH Bid, RTP;
+  FROM ENV TO DRint WITH BidAccepted, BidRefused, RTPAccepted, RTPRefused;
+SIGNALROUTE R21
+  FROM ENV TO AMIint WITH MeteringSum;
+SIGNALROUTE R23
+  FROM ENV TO DRint WITH SaleEnergy;
+PROCESS AMIint (1, 1) REFERENCED;
+PROCESS DRint (1, 1) REFERENCED;
+CONNECT C14 AND R22, R20;
+CONNECT C12 AND R19, R21;
+CONNECT C8 AND R23;
+ENDBLOCK ESI;
+
+
+
+PROCESS AMIint (1, 1);
+DCL
+  SumCons Consumption,
+  HANCons Consumption := 0;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT MeteringSum(SumCons);
+    TASK HANCOns := SumCons;
+    NEXTSTATE -;
+  INPUT getMetering;
+    OUTPUT SendMetering(HANCons);
+    NEXTSTATE -;
+ENDSTATE;
+ENDPROCESS AMIint;
+
+
+
+PROCESS DRint (1, 1);
+DCL
+  ID BidID,
+  Cons Consumption,
+  P,
+  Pref Price,
+  Busy,
+  S Boolean,
+  Sale Boolean := False;
+DCL
+  RID RTPID,
+  RTPuse Boolean := True,
+  Dur Duration;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT SaleEnergy(S, P);
+    TASK Sale := S;
+    TASK Pref := P;
+    NEXTSTATE -;
+  INPUT Bid(ID, Cons, P);
+    DECISION Sale;
+    (True) :
+      DECISION Busy;
+      (False) :
+        DECISION P >= Pref;
+        (True) :
+          TASK Busy := True;
+          OUTPUT Bid(ID, Cons, P) VIA R19;
+          NEXTSTATE -;
+        (False) :
+        ENDDECISION;
+      (True) :
+      ENDDECISION;
+    (False) :
+    ENDDECISION;
+    OUTPUT AcceptBid(ID, False);
+    NEXTSTATE -;
+  INPUT BidAccepted(ID);
+    OUTPUT AcceptBid(ID, True);
+    TASK Busy := False;
+    NEXTSTATE -;
+  INPUT BidRefused(ID);
+    OUTPUT AcceptBid(ID, False);
+    TASK Busy := False;
+    NEXTSTATE -;
+ENDSTATE;
+
+STATE ready;
+  INPUT RTP(RID, Cons, Dur, P);
+    DECISION RTPuse;
+    (True) :
+      OUTPUT RTP(RID, Cons, Dur, P) VIA R19;
+      TASK RTPuse := False;
+      NEXTSTATE -;
+    (False) :
+      OUTPUT AcceptRTP(RID, False);
+      NEXTSTATE -;
+    ENDDECISION;
+  INPUT RTPRefused(RID);
+    OUTPUT AcceptRTP(RID, False);
+    NEXTSTATE -;
+  INPUT RTPAccepted(RID);
+    OUTPUT AcceptRTP(RID, True);
+    NEXTSTATE -;
+  SAVE *;
+ENDSTATE;
+ENDPROCESS DRint;
+
+
+
+BLOCK SM;
+SIGNALROUTE R25
+  FROM ENV TO Metering WITH MeteringSum;
+SIGNALROUTE R24
+  FROM Metering TO ENV WITH ApproxBilling;
+PROCESS Metering (1, 1) REFERENCED;
+CONNECT C13 AND R25;
+CONNECT C7 AND R24;
+ENDBLOCK SM;
+
+
+
+PROCESS Metering (1, 1);
+DCL
+  Ucost Real := 1.16118,
+  SumCons Consumption,
+  Tcost Price := 0;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT MeteringSum(SumCons);
+    TASK Tcost := SumCons * Ucost / 60;
+    OUTPUT ApproxBilling(Tcost);
+    NEXTSTATE -;
+ENDSTATE;
+ENDPROCESS Metering;
+
+
+
+BLOCK IHD;
+SIGNALROUTE R27
+  FROM SetAndDisplay TO ENV WITH ChargeCar;
+  FROM ENV TO SetAndDisplay WITH EVready;
+SIGNALROUTE R28
+  FROM SetAndDisplay TO ENV WITH (IHD2H);
+  FROM ENV TO SetAndDisplay WITH UnregisterEV;
+SIGNALROUTE R30
+  FROM ENV TO SetAndDisplay WITH Register;
+SIGNALROUTE R29
+  FROM ENV TO SetAndDisplay WITH ApproxBilling;
+SIGNALROUTE R31
+  FROM SetAndDisplay TO ENV WITH SaleEnergy;
+SIGNALROUTE R26
+  FROM ENV TO SetAndDisplay WITH (ENV2IHD);
+PROCESS SetAndDisplay (1, 1) REFERENCED;
+CONNECT C6 AND R27;
+CONNECT C5 AND R28;
+CONNECT C2 AND R30;
+CONNECT C8 AND R31;
+CONNECT C7 AND R29;
+CONNECT C4 AND R26;
+ENDBLOCK IHD;
+
+
+
+PROCESS SetAndDisplay (1, 1);
+DCL
+  DevID AppID,
+  DevType AppType,
+  SenderID PID,
+  Ch Charge,
+  PR DevPriority,
+  Tcost Price,
+  MyCost,
+  OldCost Price := 0,
+  Internal,
+  Evexist Boolean := False,
+  S Boolean;
+DCL
+  Sale Boolean,
+  Pref Price;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT Register(DevID, DevType, PR);
+    TASK SenderID := SENDER;
+    OUTPUT AddDevice(DevID, DevType, SenderID, PR);
+    NEXTSTATE -;
+  INPUT EVready(Ch);
+    TASK EVexist := True;
+    DECISION 'Charge the Car';
+    ('YES') :
+      OUTPUT ChargeCar VIA R27;
+    ('NO') :
+    ENDDECISION;
+    NEXTSTATE -;
+  INPUT ApproxBilling(Tcost);
+    TASK MyCost := Tcost - OldCost;
+    NEXTSTATE -;
+  INPUT UseStorage(S);
+    DECISION Internal XOR S;
+    (True) :
+      TASK Internal := S;
+      OUTPUT UseStorage(Internal) VIA R28;
+    (False) :
+    ENDDECISION;
+    NEXTSTATE -;
+ENDSTATE;
+
+STATE ready;
+  INPUT UnregisterEV;
+    TASK EVexist := False;
+    NEXTSTATE -;
+  INPUT ChargeCar;
+    DECISION EVexist;
+    (True) :
+      OUTPUT ChargeCar VIA R27;
+    (False) :
+    ENDDECISION;
+    NEXTSTATE -;
+  INPUT ResetCost;
+    TASK OldCost := MyCost;
+    NEXTSTATE -;
+  INPUT SaleEnergy(S, Pref);
+    DECISION Sale XOR S;
+    (True) :
+      TASK Sale := S;
+      OUTPUT SaleEnergy(Sale, Pref) VIA R31;
+    (False) :
+    ENDDECISION;
+    NEXTSTATE -;
+  SAVE *;
+ENDSTATE;
+ENDPROCESS SetAndDisplay;
+
+
+
+BLOCK PEV;
+SIGNAL
+  Subscribe,
+  StopEV,
+  SendCons,
+  StoppedEV,
+  Discharge(Consumption);
+SIGNALROUTE R33
+  FROM ENV TO PlugEV WITH (ENV2PEV);
+SIGNALROUTE R34
+  FROM PlugEV TO ENV WITH SendBatteryCharge;
+  FROM ENV TO PlugEV WITH (H2PEV);
+SIGNALROUTE R36
+  FROM EV TO ENV WITH RegisterEV, UnregisterEV, MeteringData, RevisedBatt;
+SIGNALROUTE R35
+  FROM PlugEV TO EV WITH Subscribe, StopEV, SendCons, Discharge;
+  FROM EV TO PlugEV WITH StoppedEV;
+SIGNALROUTE R32
+  FROM PlugEV TO ENV WITH EVready;
+  FROM ENV TO PlugEV WITH ChargeCar;
+PROCESS EV (0, 1) REFERENCED;
+PROCESS PlugEV (1, 1) REFERENCED;
+CONNECT C9 AND R33;
+CONNECT C10 AND R34, R36;
+CONNECT C6 AND R32;
+ENDBLOCK PEV;
+
+
+
+PROCESS PlugEV (1, 1);
+DCL
+  EVexist,
+  DISC Boolean := False,
+  Ch Charge,
+  Cons Consumption,
+  EVfull FULL,
+  EVID PID;
+VIEWED
+  Battery Consumption;
+DCL
+  V_Battery,
+  C Consumption;
+
+START;
+    NEXTSTATE ready;
+
+STATE ready;
+  INPUT ConnectEV(Ch, Cons, EVfull);
+    DECISION EVexist;
+    (False) :
+      TASK EVexist := True;
+      CREATE EV(Ch, Cons, EVfull);
+      TASK EVID := OFFSPRING;
+      OUTPUT Subscribe TO EVID;
+      NEXTSTATE waitOK;
+    (True) :
+      NEXTSTATE -;
+    ENDDECISION;
+ENDSTATE;
+
+STATE waitOK;
+  INPUT RegisterEVOK;
+    OUTPUT EVready(Ch);
+    NEXTSTATE WaitOption;
+ENDSTATE;
+
+STATE * ;
+  PRIORITY INPUT DisconnectEV;
+    DECISION DISC;
+    (True) :
+      NEXTSTATE -;
+    (False) :
+      TASK DISC := True;
+      DECISION EVexist;
+      (True) :
+        OUTPUT StopEV TO EVID;
+        TASK EVID := NULL;
+        NEXTSTATE -;
+      (False) :
+        NEXTSTATE ready;
+      ENDDECISION;
+    ENDDECISION;
+ENDSTATE;
+
+STATE * ;
+  INPUT StoppedEV;
+    TASK EVexist := False,
+      DISC := False;
+    NEXTSTATE ready;
+ENDSTATE;
+
+STATE waitOption;
+  INPUT ChargeCar;
+    DECISION EVID;
+    (NULL) :
+    ELSE :
+      OUTPUT SendCons TO EVID;
+    ENDDECISION;
+    NEXTSTATE -;
+  INPUT getBatteryCharge;
+    DECISION EVID;
+    (NULL) :
+      OUTPUT SendBatteryCharge(0);
+    ELSE :
+      TASK V_Battery := VIEW(Battery);
+      OUTPUT SendBatteryCharge(V_Battery);
+    ENDDECISION;
+    NEXTSTATE -;
+  INPUT ReviseBattery(C);
+    DECISION EVID;
+    (NULL) :
+    ELSE :
+      OUTPUT Discharge(C) TO EVID;
+    ENDDECISION;
+    NEXTSTATE -;
+ENDSTATE;
+
+STATE * ;
+  SAVE *;
+ENDSTATE;
+ENDPROCESS PlugEV;
+
+
+
+PROCESS EV (0, 1);
+FPAR
+  myCharge Charge,
+  myCons Consumption,
+  myFull FULL;
+TIMER
+  T := 60;
+DCL
+  C Consumption;
+DCL REVEALED
+  Battery Consumption;
+
+START;
+    NEXTSTATE idle;
+
+STATE idle;
+  INPUT Subscribe;
+    TASK Battery := (myCharge * myFull) / 100;
+    OUTPUT RegisterEV;
+    NEXTSTATE StandBy;
+ENDSTATE;
+
+STATE StandBy;
+  INPUT SendCons;
+    SET(T);
+    NEXTSTATE SendingCons;
+ENDSTATE;
+
+STATE * ;
+  PRIORITY INPUT Discharge(C);
+    DECISION C < Battery;
+    (True) :
+      TASK Battery := Battery - C;
+      OUTPUT RevisedBatt(True);
+    (False) :
+      OUTPUT RevisedBatt(False);
+    ENDDECISION;
+    NEXTSTATE -;
+  PRIORITY INPUT StopEV;
+    OUTPUT UnregisterEV;
+    OUTPUT StoppedEV;
+    STOP;
+ENDSTATE;
+
+STATE SendingCons;
+  INPUT T;
+    DECISION Battery = myFull;
+    (True) :
+      NEXTSTATE StandBy;
+    (False) :
+      OUTPUT MeteringData(myCons);
+      DECISION Battery + myCons >= myFull;
+      (False) :
+        TASK Battery := Battery + myCons;
+        SET(T);
+        NEXTSTATE -;
+      (True) :
+        TASK Battery := myFull;
+        NEXTSTATE StandBy;
+      ENDDECISION;
+    ENDDECISION;
+  SAVE SendCons;
+ENDSTATE;
+ENDPROCESS EV;
+
+

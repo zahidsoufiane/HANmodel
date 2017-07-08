@@ -1,0 +1,37 @@
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr,4)*/
+process AMIint(1,1);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),161(95,15))*/
+DCL
+SumCons Consumption,
+HANCons Consumption:=0;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),116(45,45))*/
+start /*#E*/ 
+;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),119(45,70))*/
+nextstate /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),119(45,70))*/
+state /*#E*/ 
+ready;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),122(30,90))*/
+input /*#E*/ 
+MeteringSum(SumCons);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),125(35,110))*/
+task /*#E*/ 
+HANCOns:=SumCons;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),128(45,130))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),131(120,90))*/
+input /*#E*/ 
+getMetering;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),134(115,110))*/
+output /*#E*/ 
+SendMetering(HANCons);
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),137(130,130))*/
+nextstate /*#E*/ 
+_;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr(1),119(45,70))*/
+endstate;
+/*#SDTREF(SDL,C:\Telelogic\SDL_TTCN_Suite6.2\work\HAN\AMIint.spr,4)*/
+endprocess AMIint;

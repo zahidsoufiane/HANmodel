@@ -1,0 +1,74 @@
+SDT-SYSTEM-6.2
+[DRIVES]
+[SOURCE-TARGET-DIRECTORY]
+[LINKS]
+Endpoints=""
+File=HAN.sli
+[DIAGRAMS]
+0 16 HAN HAN.msc 0 1491254003 - ""
+0 11 HANmessages ..\HANmessages.sun 0 1488042236 HANmessages ""
+0 1 HAN ..\HAN.ssy 0 1486769595 HAN ""
+1 2 Appliance ..\Appliance.sbk 0 1487790273 A ""
+2 5 SmartPlug ..\SmartPlug.spr 0 1487961362 S ""
+2 5 Device ..\Device.spr 0 1487789570 D ""
+1 2 HEMS ..\HEMS.sbk 0 1488042309 H ""
+2 5 DeviceDB ..\DeviceDB.spr 0 1485382020 D1 ""
+2 5 DemandResponse ..\DemandResponse.spr 0 1488042745 D2 ""
+2 5 EnergyUse ..\EnergyUse.spr 0 1485054803 E ""
+1 2 ESI ..\ESI.sbk 0 1485300683 E1 ""
+2 5 AMIint ..\AMIint.spr 0 1485054863 A1 ""
+2 5 DRint ..\DRint.spr 0 1485382234 D3 ""
+1 2 SM ..\SM.sbk 0 1485047276 S1 ""
+2 5 Metering ..\Metering.spr 0 1485054945 M ""
+1 2 IHD ..\IHD.sbk 0 1485302085 I ""
+2 5 SetAndDisplay ..\SetAndDisplay.spr 0 1485381862 S2 ""
+1 2 PEV ..\PEV.sbk 0 1488042167 P ""
+2 5 PlugEV ..\PlugEV.spr 0 1488049588 P1 ""
+2 5 EV ..\EV.spr 0 1488042052 E2 ""
+0 23 "Other Documents" %unconnected% 0 0 0 ""
+[VIEWOPTIONS]
+ShowDirectories=True
+ShowLongMenus=True
+[ANALYSEROPTIONS]
+ASN1KeywordFile=False
+ASN1Parameter=False
+CoderBufferInSDL=Octet-String
+ErrorLimit=108
+Filter=False
+InstanceFile=False
+SynonymFileName=""
+[H2SDLOPTIONS]
+AllWarnings=False
+Preprocessor=""
+PreprocessorOptions=""
+TranslateEnum=True
+UseFullPath=True
+UsePreprocessorOptions=False
+[STATEMATRIXOPTIONS]
+[INDEXOPTIONS]
+ShowSelectedTypes=True
+ShowSelectedUses=True
+ShowSelectedDiagrams=True
+FilterTypes=
+FilterUses=
+FilterDiagrams=
+NameFirst=True
+IndexAppearance=
+[PACKAGEGENERATOROPTIONS]
+DuplicateFile=
+[MAKEOPTIONS]
+CCompilerDriver=False
+Kernel=sctamvalidator
+[PRINTOPTIONS]
+DestinationFormat=PSFile
+FirstPageNo=1
+MarginLeft=100
+MarginLower=50
+MarginRight=100
+MarginUpper=50
+PrinterFile=""
+PrintFrom=0
+PrintTo=0
+PrintToFile=False
+TableOfContents=True
+OrganizerView=False
